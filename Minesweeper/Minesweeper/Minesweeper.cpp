@@ -11,8 +11,8 @@ constexpr int ROWS{ 7 };
 constexpr int COLUMNS{ 7 };
 constexpr int MINES{ 12 };
 int MATRIX[ROWS][COLUMNS]{};
-char B_MATRIX[ROWS][COLUMNS]{};
-char UI_MATRIX[ROWS][COLUMNS]{};
+char B_MATRIX[ROWS][COLUMNS]{}; //  this matrix will only display when the player loses
+char UI_MATRIX[ROWS][COLUMNS]{}; // this matrix represents the interface that the player interacts with
 
 
 void printMatrix(char MATRIX[][COLUMNS]) {
@@ -41,42 +41,40 @@ void printMatrix(char MATRIX[][COLUMNS]) {
 void generateMines() {
 	
 	static std::mt19937 mt{ static_cast<std::mt19937::result_type>(std::time(nullptr)) };
-
+	// we  generate bombs until we reach the total number of bombs 
 	int k{ 0 };
 	do {
-		int row{ mt() % ROWS };  // alege un rand si o coloana random
+		int row{ mt() % ROWS };  
 		int column{ mt() % COLUMNS };
 
 		if (B_MATRIX[row][column] != '*') {
 			B_MATRIX[row][column] = '*';
 			k++;
 		}
-		// plasam mine pana ajungem la nr total
+		// if the tile already has a bomb present we will generate another bomb
 	} while (k != MINES);  
 	
 
-	for (int i = 0; i < ROWS; i++) { // generare matrice cu indici
+	for (int i = 0; i < ROWS; i++) { 
 		for (int j = 0; j < COLUMNS; j++) {
 	
-			UI_MATRIX[i][j] = '?';  // genram matrice ui(doar playeru poate sa o vada)
+			UI_MATRIX[i][j] = '?';  // all the tiles start with the '?' symbol on them
 		}
 		//std::cout << '\n';
 	}
-	// amplasare mine fara dubluri
-	// trb sortat bombs nu ia ultima linie INCEP DE LA 0 U DUMBFUCK
 }
 
 bool isValid(int row, int column) {
 
-	if (row >= 0 && row < ROWS && column >= 0 && column < COLUMNS) // verificam daca indicele de rand sau coloana e in afaara matricei
+	if (row >= 0 && row < ROWS && column >= 0 && column < COLUMNS) // we check if the cell is in between bounds
 		return true;
 	else
 		return false;
 }
 int numberOfNeighbours(int row, int column) {
 
-	int neighbours{ 0 };  // pt fiecare celula verificam toti vecinii daca sunt mine
-	// linia de sus
+	int neighbours{ 0 };  // for every neighbouring cells we check if there are bombs
+	// the upper cells
 	if (isValid(row - 1, column - 1) && B_MATRIX[row - 1][column - 1] == '*')
 		neighbours++;
 	if (isValid(row - 1, column) && B_MATRIX[row - 1][column] == '*')
@@ -84,13 +82,13 @@ int numberOfNeighbours(int row, int column) {
 	if (isValid(row - 1, column + 1) && B_MATRIX[row - 1][column + 1] == '*')
 		neighbours++;  
 
-	// linia de mijloc
+	// the middle line
 	if (isValid(row , column - 1) && B_MATRIX[row][column - 1] == '*')
 		neighbours++;
 	if (isValid(row , column + 1) && B_MATRIX[row][column + 1] == '*')
 		neighbours++;
 
-	// linia de jos
+	// the lower cells
 	if (isValid(row + 1, column - 1) && B_MATRIX[row + 1][column - 1] == '*')
 		neighbours++;
 	if (isValid(row + 1, column) && B_MATRIX[row + 1][column] == '*')
@@ -106,24 +104,31 @@ void generateNumbers() {
 	for (int i = 0; i < ROWS; i++) {
 		for (int j = 0; j < COLUMNS; j++) {
 			if (B_MATRIX[i][j] != '*')
-				B_MATRIX[i][j] = static_cast<char>(numberOfNeighbours(i, j) + 48); // conversie din int in char +48(pt ca ascii)
+				B_MATRIX[i][j] = static_cast<char>(numberOfNeighbours(i, j) + 48); // we insert the number representing the number of bombs nearby 
 		}
 	}
 }
 
 bool isBomb(int row, int column) {
-	return(B_MATRIX[row][column] == '*'); //verificam dace e mina
+	return(B_MATRIX[row][column] == '*'); 
 }
 
 void replaceCell(int row, int column) {
 
-	UI_MATRIX[row][column] = B_MATRIX[row][column]; // inlocuim celula din matricea ui
+	UI_MATRIX[row][column] = B_MATRIX[row][column]; 
 }
 
 void placeBomb(int row, int column) {
-	UI_MATRIX[row][column] = '*';  // playeru plaseaza bomba
+	UI_MATRIX[row][column] = '*';  // the player places a bomb in the UI matrix
 }
 
+bool isWon() {
+	for (int i = 0; i < ROWS; i++)
+		for (int j = 0; j < COLUMNS; j++)
+			if (B_MATRIX[i][j] != UI_MATRIX[i][j])
+				return false;
+	return true;
+}
 void playGame() {
 	std::cout << "WELCOME TO MINESWEEPER!\n";
 	int row{};
@@ -156,16 +161,18 @@ void playGame() {
 			else {
 				placeBomb(row - 1, column - 1);
 			}
-			
-			//printMatrix(UI_MATRIX);
+
 		}
+
+		if (isWon())
+			std::cout << "\nYOU WIN!\n";
 	}
 }
 int main()
 {
 	generateMines();
 	generateNumbers();
-	//printMatrix(B_MATRIX);
+
 	playGame();
 }
 
