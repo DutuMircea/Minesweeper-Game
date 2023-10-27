@@ -14,23 +14,7 @@ int MATRIX[ROWS][COLUMNS]{};
 char B_MATRIX[ROWS][COLUMNS]{};
 char UI_MATRIX[ROWS][COLUMNS]{};
 
-// old function
-void generateRandomArray() {
-	std::array<int, MINES> bombs{};
 
-	static std::mt19937 mt{ static_cast<std::mt19937::result_type>(std::time(nullptr)) };
-
-	for (std::size_t i = 0; i < MINES; i++) {  // generare vector de bombe
-		bombs[i] = 1 +  mt() % (ROWS * COLUMNS);
-		//std::cout << bombs[i] << ' ';
-	} 
-	std::sort(bombs.begin(), bombs.end(), std::less<int>());
-
-	for (int i : bombs)
-		std::cout << i << ' ';
-
-} 
-// doar printare
 void printMatrix(char MATRIX[][COLUMNS]) {
 
 	std::cout << "    ";
