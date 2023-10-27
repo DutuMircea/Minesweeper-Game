@@ -104,7 +104,8 @@ void generateNumbers() {
 	for (int i = 0; i < ROWS; i++) {
 		for (int j = 0; j < COLUMNS; j++) {
 			if (B_MATRIX[i][j] != '*')
-				B_MATRIX[i][j] = static_cast<char>(numberOfNeighbours(i, j) + 48); // we insert the number representing the number of bombs nearby 
+				B_MATRIX[i][j] = static_cast<char>(numberOfNeighbours(i, j) + 48); 
+			// we insert the number representing the number of bombs nearby 
 		}
 	}
 }
@@ -127,6 +128,7 @@ bool isWon() {
 		for (int j = 0; j < COLUMNS; j++)
 			if (B_MATRIX[i][j] != UI_MATRIX[i][j])
 				return false;
+	// if all the elements from both matrices are equal then the player has won
 	return true;
 }
 void playGame() {
@@ -149,8 +151,8 @@ void playGame() {
 		std::cin >> column;
 		std::cout << '\n';
 
-		if (isBomb(row - 1, column - 1)) {  // -1 pt ca incepem de la 0 dar playerul alege de la 1
-			std::cout << "GAME OVER!\n";
+		if (isBomb(row - 1, column - 1)) {  // -1 because the inexing starts at 0 but the player starts at 1
+			std::cout << "\nGAME OVER!\n";  // if the player hits a bombs it's GAME OVER
 			printMatrix(B_MATRIX);
 			return;
 		}
